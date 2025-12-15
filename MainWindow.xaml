@@ -1,0 +1,127 @@
+<Window x:Class="PdfRedactionApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PdfRedactionApp"
+        mc:Ignorable="d"
+        Title="PDF智能脱敏工具" Height="700" Width="1200">
+    <DockPanel LastChildFill="True">
+        <StatusBar DockPanel.Dock="Bottom" Height="30">
+            <StatusBarItem>
+                <TextBlock Name="txtStatus" Text="{Binding StatusText}"/>
+            </StatusBarItem>
+        </StatusBar>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 工具栏 -->
+            <ToolBar Grid.Row="0" Height="40">
+                <Button Name="btnOpenFile" Content="打开PDF" Click="BtnOpenFile_Click" Margin="5"/>
+                <Button Name="btnProcess" Content="开始脱敏" Click="BtnProcess_Click" Margin="5"/>
+                <Button Name="btnSave" Content="保存结果" Click="BtnSave_Click" Margin="5"/>
+                <Separator/>
+                <Label Content="处理进度:" VerticalAlignment="Center"/>
+                <ProgressBar Name="progressBar" Width="200" Height="20" Margin="5" Value="{Binding ProgressValue}"/>
+                <Label Name="lblProgress" Content="{Binding ProgressText}" Width="40"/>
+            </ToolBar>
+            
+            <!-- 主内容区 -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="250"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- 双栏对比视图 -->
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- 原始PDF显示区域 -->
+                    <Grid Grid.Column="0" Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Content="原始文档" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        <Grid Grid.Row="1" Name="pdfOriginalContainer">
+                            <!-- PdfiumViewer控件将在这里动态添加 -->
+                        </Grid>
+                    </Grid>
+                    
+                    <!-- 脱敏后PDF显示区域 -->
+                    <Grid Grid.Column="1" Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Content="脱敏后文档" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        <Grid Grid.Row="1" Name="pdfRedactedContainer">
+                            <!-- PdfiumViewer控件将在这里动态添加 -->
+                        </Grid>
+                    </Grid>
+                </Grid>
+                
+                <!-- 右侧面板 -->
+                <Grid Grid.Column="1" Background="LightGray">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- 脱敏规则配置面板 -->
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Content="脱敏规则配置" HorizontalAlignment="Center" FontWeight="Bold" Margin="5"/>
+                        <StackPanel Grid.Row="1" Margin="10">
+                            <CheckBox Name="chkName" Content="姓名脱敏" Margin="5"/>
+                            <CheckBox Name="chkIdCard" Content="身份证号脱敏" Margin="5"/>
+                            <CheckBox Name="chkPhone" Content="电话号码脱敏" Margin="5"/>
+                            <CheckBox Name="chkAddress" Content="地址脱敏" Margin="5"/>
+                            
+                            <!-- 自定义关键字区域 -->
+                            <Separator Margin="0,10,0,10"/>
+                            <Label Content="自定义关键字" FontWeight="Bold" Margin="5,0,5,0"/>
+                            <TextBox Name="txtKeyword" ToolTip="输入关键字" Margin="5"/>
+                            <Button Name="btnAddKeyword" Content="添加关键字" Click="BtnAddKeyword_Click" Margin="5" Padding="5"/>
+                            <ListBox Name="listKeywords" Height="100" Margin="5"/>
+                            <Button Name="btnRemoveKeyword" Content="删除选中关键字" Click="BtnRemoveKeyword_Click" Margin="5" Padding="5"/>
+                            
+                            <Button Name="btnSaveConfig" Content="保存配置" Click="BtnSaveConfig_Click" Margin="5" Padding="5"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <!-- 敏感信息列表 -->
+                    <Grid Grid.Row="1" Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Content="识别出的敏感信息" HorizontalAlignment="Center" FontWeight="Bold" Margin="5"/>
+                        <DataGrid Grid.Row="1" Name="dataGridSensitiveInfo" AutoGenerateColumns="False" IsReadOnly="True" Margin="5" SelectionMode="Single" ItemsSource="{Binding DisplaySensitiveInfos}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="类型" Binding="{Binding Type}" Width="80"/>
+                                <DataGridTextColumn Header="原始文本" Binding="{Binding OriginalText}" Width="120"/>
+                                <DataGridTextColumn Header="脱敏后文本" Binding="{Binding RedactedText}" Width="120"/>
+                                <DataGridTextColumn Header="页码" Binding="{Binding PageNumber}" Width="50"/>
+                                <DataGridTextColumn Header="位置" Binding="{Binding Position}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+        
+        
+    </DockPanel>
+</Window>
