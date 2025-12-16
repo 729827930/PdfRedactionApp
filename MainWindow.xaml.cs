@@ -182,13 +182,8 @@ public partial class MainWindow : Window
             
             if (openFileDialog.ShowDialog() == true)
             {
-                // 清理ViewModel中的所有相关属性
-                viewModel.TempRedactedFilePath = string.Empty;
-                viewModel.ProgressValue = 0;
-                viewModel.StatusText = string.Empty;
-                viewModel.SensitiveInfos = new List<SensitiveInfo>();
-                viewModel.DisplaySensitiveInfos.Clear();
-                viewModel.ManualRedactionAreas.Clear();
+                // 重置所有状态
+                viewModel.ResetAllStates();
                 
                 viewModel.SelectedFilePath = openFileDialog.FileName;
                 viewModel.StatusText = $"已选择文件: {viewModel.SelectedFilePath}";
@@ -205,10 +200,10 @@ public partial class MainWindow : Window
                     // 再次检查以确保初始化成功
                     if (pdfOriginalViewer != null)
                     {
-                        // 清理之前的脱敏结果
+                        // 清理之前的脱敏结果 - 重置脱敏后PDF查看器显示空白页面
                         if (pdfRedactedViewer != null)
                         {
-                            pdfRedactedViewer.Document = null;
+                            pdfRedactedViewer.Document = null; // 这会清除显示内容
                         }
                         
                         pdfOriginalViewer.Document = PdfiumViewer.PdfDocument.Load(viewModel.SelectedFilePath);

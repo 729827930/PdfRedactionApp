@@ -384,6 +384,19 @@ namespace PdfRedactionApp.ViewModels
         }
         
         /// <summary>
+        /// 重置所有状态，用于打开新文件前的清理工作
+        /// </summary>
+        public void ResetAllStates()
+        {
+            TempRedactedFilePath = string.Empty;
+            ProgressValue = 0;
+            StatusText = string.Empty;
+            SensitiveInfos = new List<SensitiveInfo>();
+            DisplaySensitiveInfos.Clear();
+            ManualRedactionAreas.Clear();
+        }
+        
+        /// <summary>
         /// 更新用于显示的敏感信息列表
         /// </summary>
         private void UpdateDisplaySensitiveInfos()
